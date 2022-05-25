@@ -1286,6 +1286,7 @@ type TodoMutation struct {
 	id              *int
 	created_at      *time.Time
 	status          *todo.Status
+	kind            *todo.Kind
 	priority        *int
 	addpriority     *int
 	text            *string
@@ -1473,6 +1474,42 @@ func (m *TodoMutation) OldStatus(ctx context.Context) (v todo.Status, err error)
 // ResetStatus resets all changes to the "status" field.
 func (m *TodoMutation) ResetStatus() {
 	m.status = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *TodoMutation) SetKind(t todo.Kind) {
+	m.kind = &t
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *TodoMutation) Kind() (r todo.Kind, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the Todo entity.
+// If the Todo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TodoMutation) OldKind(ctx context.Context) (v todo.Kind, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *TodoMutation) ResetKind() {
+	m.kind = nil
 }
 
 // SetPriority sets the "priority" field.
@@ -1842,12 +1879,15 @@ func (m *TodoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TodoMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, todo.FieldCreatedAt)
 	}
 	if m.status != nil {
 		fields = append(fields, todo.FieldStatus)
+	}
+	if m.kind != nil {
+		fields = append(fields, todo.FieldKind)
 	}
 	if m.priority != nil {
 		fields = append(fields, todo.FieldPriority)
@@ -1873,6 +1913,8 @@ func (m *TodoMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case todo.FieldStatus:
 		return m.Status()
+	case todo.FieldKind:
+		return m.Kind()
 	case todo.FieldPriority:
 		return m.Priority()
 	case todo.FieldText:
@@ -1894,6 +1936,8 @@ func (m *TodoMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case todo.FieldStatus:
 		return m.OldStatus(ctx)
+	case todo.FieldKind:
+		return m.OldKind(ctx)
 	case todo.FieldPriority:
 		return m.OldPriority(ctx)
 	case todo.FieldText:
@@ -1924,6 +1968,13 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case todo.FieldKind:
+		v, ok := value.(todo.Kind)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
 		return nil
 	case todo.FieldPriority:
 		v, ok := value.(int)
@@ -2037,6 +2088,9 @@ func (m *TodoMutation) ResetField(name string) error {
 		return nil
 	case todo.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case todo.FieldKind:
+		m.ResetKind()
 		return nil
 	case todo.FieldPriority:
 		m.ResetPriority()

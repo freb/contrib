@@ -48,6 +48,11 @@ func (Todo) Fields() []ent.Field {
 				entgql.OrderField("STATUS"),
 				entgql.Type("StatusX"),
 			),
+		field.Enum("kind").
+			NamedValues(
+				"A", "A",
+				"B", "B",
+			),
 		field.Int("priority").
 			Default(0).
 			Annotations(

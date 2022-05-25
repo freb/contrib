@@ -56,6 +56,12 @@ func (tc *TodoCreate) SetStatus(t todo.Status) *TodoCreate {
 	return tc
 }
 
+// SetKind sets the "kind" field.
+func (tc *TodoCreate) SetKind(t todo.Kind) *TodoCreate {
+	tc.mutation.SetKind(t)
+	return tc
+}
+
 // SetPriority sets the "priority" field.
 func (tc *TodoCreate) SetPriority(i int) *TodoCreate {
 	tc.mutation.SetPriority(i)
@@ -254,6 +260,14 @@ func (tc *TodoCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Todo.status": %w`, err)}
 		}
 	}
+	if _, ok := tc.mutation.Kind(); !ok {
+		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "Todo.kind"`)}
+	}
+	if v, ok := tc.mutation.Kind(); ok {
+		if err := todo.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Todo.kind": %w`, err)}
+		}
+	}
 	if _, ok := tc.mutation.Priority(); !ok {
 		return &ValidationError{Name: "priority", err: errors.New(`ent: missing required field "Todo.priority"`)}
 	}
@@ -307,6 +321,14 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 			Column: todo.FieldStatus,
 		})
 		_node.Status = value
+	}
+	if value, ok := tc.mutation.Kind(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: todo.FieldKind,
+		})
+		_node.Kind = value
 	}
 	if value, ok := tc.mutation.Priority(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

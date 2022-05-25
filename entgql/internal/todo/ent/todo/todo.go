@@ -32,6 +32,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldKind holds the string denoting the kind field in the database.
+	FieldKind = "kind"
 	// FieldPriority holds the string denoting the priority field in the database.
 	FieldPriority = "priority"
 	// FieldText holds the string denoting the text field in the database.
@@ -79,6 +81,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldStatus,
+	FieldKind,
 	FieldPriority,
 	FieldText,
 	FieldBlob,
@@ -139,6 +142,29 @@ func StatusValidator(s Status) error {
 	}
 }
 
+// Kind defines the type for the "kind" enum field.
+type Kind string
+
+// Kind values.
+const (
+	KindA Kind = "A"
+	KindB Kind = "B"
+)
+
+func (k Kind) String() string {
+	return string(k)
+}
+
+// KindValidator is a validator for the "kind" field enum values. It is called by the builders before save.
+func KindValidator(k Kind) error {
+	switch k {
+	case KindA, KindB:
+		return nil
+	default:
+		return fmt.Errorf("todo: invalid enum value for kind field: %q", k)
+	}
+}
+
 // MarshalGQL implements graphql.Marshaler interface.
 func (e Status) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(e.String()))
@@ -153,6 +179,24 @@ func (e *Status) UnmarshalGQL(val interface{}) error {
 	*e = Status(str)
 	if err := StatusValidator(*e); err != nil {
 		return fmt.Errorf("%s is not a valid Status", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Kind) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Kind) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Kind(str)
+	if err := KindValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Kind", str)
 	}
 	return nil
 }

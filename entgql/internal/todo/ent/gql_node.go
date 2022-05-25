@@ -165,7 +165,7 @@ func (t *Todo) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     t.ID,
 		Type:   "Todo",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 6),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
@@ -185,10 +185,18 @@ func (t *Todo) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "status",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(t.Priority); err != nil {
+	if buf, err = json.Marshal(t.Kind); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "todo.Kind",
+		Name:  "kind",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Priority); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "int",
 		Name:  "priority",
 		Value: string(buf),
@@ -196,7 +204,7 @@ func (t *Todo) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(t.Text); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "string",
 		Name:  "text",
 		Value: string(buf),
@@ -204,7 +212,7 @@ func (t *Todo) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(t.CategoryID); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "int",
 		Name:  "category_id",
 		Value: string(buf),

@@ -266,6 +266,54 @@ func StatusNotIn(vs ...Status) predicate.Todo {
 	})
 }
 
+// KindEQ applies the EQ predicate on the "kind" field.
+func KindEQ(v Kind) predicate.Todo {
+	return predicate.Todo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldKind), v))
+	})
+}
+
+// KindNEQ applies the NEQ predicate on the "kind" field.
+func KindNEQ(v Kind) predicate.Todo {
+	return predicate.Todo(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldKind), v))
+	})
+}
+
+// KindIn applies the In predicate on the "kind" field.
+func KindIn(vs ...Kind) predicate.Todo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Todo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldKind), v...))
+	})
+}
+
+// KindNotIn applies the NotIn predicate on the "kind" field.
+func KindNotIn(vs ...Kind) predicate.Todo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Todo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldKind), v...))
+	})
+}
+
 // PriorityEQ applies the EQ predicate on the "priority" field.
 func PriorityEQ(v int) predicate.Todo {
 	return predicate.Todo(func(s *sql.Selector) {

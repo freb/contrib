@@ -49,6 +49,12 @@ func (tu *TodoUpdate) SetStatus(t todo.Status) *TodoUpdate {
 	return tu
 }
 
+// SetKind sets the "kind" field.
+func (tu *TodoUpdate) SetKind(t todo.Kind) *TodoUpdate {
+	tu.mutation.SetKind(t)
+	return tu
+}
+
 // SetPriority sets the "priority" field.
 func (tu *TodoUpdate) SetPriority(i int) *TodoUpdate {
 	tu.mutation.ResetPriority()
@@ -277,6 +283,11 @@ func (tu *TodoUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Todo.status": %w`, err)}
 		}
 	}
+	if v, ok := tu.mutation.Kind(); ok {
+		if err := todo.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Todo.kind": %w`, err)}
+		}
+	}
 	if v, ok := tu.mutation.Text(); ok {
 		if err := todo.TextValidator(v); err != nil {
 			return &ValidationError{Name: "text", err: fmt.Errorf(`ent: validator failed for field "Todo.text": %w`, err)}
@@ -308,6 +319,13 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: todo.FieldStatus,
+		})
+	}
+	if value, ok := tu.mutation.Kind(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: todo.FieldKind,
 		})
 	}
 	if value, ok := tu.mutation.Priority(); ok {
@@ -525,6 +543,12 @@ type TodoUpdateOne struct {
 // SetStatus sets the "status" field.
 func (tuo *TodoUpdateOne) SetStatus(t todo.Status) *TodoUpdateOne {
 	tuo.mutation.SetStatus(t)
+	return tuo
+}
+
+// SetKind sets the "kind" field.
+func (tuo *TodoUpdateOne) SetKind(t todo.Kind) *TodoUpdateOne {
+	tuo.mutation.SetKind(t)
 	return tuo
 }
 
@@ -769,6 +793,11 @@ func (tuo *TodoUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Todo.status": %w`, err)}
 		}
 	}
+	if v, ok := tuo.mutation.Kind(); ok {
+		if err := todo.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Todo.kind": %w`, err)}
+		}
+	}
 	if v, ok := tuo.mutation.Text(); ok {
 		if err := todo.TextValidator(v); err != nil {
 			return &ValidationError{Name: "text", err: fmt.Errorf(`ent: validator failed for field "Todo.text": %w`, err)}
@@ -817,6 +846,13 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: todo.FieldStatus,
+		})
+	}
+	if value, ok := tuo.mutation.Kind(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: todo.FieldKind,
 		})
 	}
 	if value, ok := tuo.mutation.Priority(); ok {

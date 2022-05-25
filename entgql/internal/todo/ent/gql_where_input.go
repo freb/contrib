@@ -593,6 +593,12 @@ type TodoWhereInput struct {
 	StatusIn    []todo.Status `json:"statusIn,omitempty"`
 	StatusNotIn []todo.Status `json:"statusNotIn,omitempty"`
 
+	// "kind" field predicates.
+	Kind      *todo.Kind  `json:"kind,omitempty"`
+	KindNEQ   *todo.Kind  `json:"kindNEQ,omitempty"`
+	KindIn    []todo.Kind `json:"kindIn,omitempty"`
+	KindNotIn []todo.Kind `json:"kindNotIn,omitempty"`
+
 	// "priority" field predicates.
 	Priority      *int  `json:"priority,omitempty"`
 	PriorityNEQ   *int  `json:"priorityNEQ,omitempty"`
@@ -763,6 +769,18 @@ func (i *TodoWhereInput) P() (predicate.Todo, error) {
 	}
 	if len(i.StatusNotIn) > 0 {
 		predicates = append(predicates, todo.StatusNotIn(i.StatusNotIn...))
+	}
+	if i.Kind != nil {
+		predicates = append(predicates, todo.KindEQ(*i.Kind))
+	}
+	if i.KindNEQ != nil {
+		predicates = append(predicates, todo.KindNEQ(*i.KindNEQ))
+	}
+	if len(i.KindIn) > 0 {
+		predicates = append(predicates, todo.KindIn(i.KindIn...))
+	}
+	if len(i.KindNotIn) > 0 {
+		predicates = append(predicates, todo.KindNotIn(i.KindNotIn...))
 	}
 	if i.Priority != nil {
 		predicates = append(predicates, todo.PriorityEQ(*i.Priority))
