@@ -46,6 +46,7 @@ func (Todo) Fields() []ent.Field {
 			).
 			Annotations(
 				entgql.OrderField("STATUS"),
+				entgql.Type("StatusX"),
 			),
 		field.Int("priority").
 			Default(0).

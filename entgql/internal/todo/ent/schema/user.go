@@ -32,6 +32,11 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			Default("Anonymous"),
+		field.Enum("kind").
+			NamedValues(
+				"C", "C",
+				"D", "D",
+			),
 	}
 }
 

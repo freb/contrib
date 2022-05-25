@@ -207,6 +207,11 @@ input GroupWhereInput {
   hasUsers: Boolean
   hasUsersWith: [UserWhereInput!]
 }
+"""Kind is enum for the field kind"""
+enum Kind @goModel(model: "entgo.io/contrib/entgql/internal/todo/ent/user.Kind") {
+  C
+  D
+}
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -299,15 +304,15 @@ type Query {
     where: UserWhereInput
   ): UserConnection!
 }
-"""Status is enum for the field status"""
-enum Status @goModel(model: "entgo.io/contrib/entgql/internal/todo/ent/todo.Status") {
+"""StatusX is enum for the field status"""
+enum StatusX @goModel(model: "entgo.io/contrib/entgql/internal/todo/ent/todo.Status") {
   IN_PROGRESS
   COMPLETED
 }
 type Todo implements Node {
   id: ID!
   createdAt: Time!
-  status: Status!
+  status: StatusX!
   priority: Int!
   text: String!
   categoryID: ID
@@ -390,10 +395,10 @@ input TodoWhereInput {
   createdAtLT: Time
   createdAtLTE: Time
   """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
+  status: StatusX
+  statusNEQ: StatusX
+  statusIn: [StatusX!]
+  statusNotIn: [StatusX!]
   """priority field predicates"""
   priority: Int
   priorityNEQ: Int
@@ -437,6 +442,7 @@ input TodoWhereInput {
 type User implements Node {
   id: ID!
   name: String!
+  kind: Kind!
   groups(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -501,6 +507,11 @@ input UserWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """kind field predicates"""
+  kind: Kind
+  kindNEQ: Kind
+  kindIn: [Kind!]
+  kindNotIn: [Kind!]
   """groups edge predicates"""
   hasGroups: Boolean
   hasGroupsWith: [GroupWhereInput!]
